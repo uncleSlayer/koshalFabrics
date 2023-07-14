@@ -1,0 +1,64 @@
+{% extends "admin/base.html" %}
+
+{% block navbarbtn %}
+<button type="button" class="btn btn-outline-dark">Login</button>
+{% endblock %}
+
+{% block content %}
+<h3 class="text-center mt-2">Hello Admin, Create a product</h3>
+
+<form action="" class="container-fluid" style="width: 70%;">
+    <div class="mb-3">
+        <label for="exampleFormControlInput1" class="form-label">Name of Saree</label>
+        <input type="text" class="form-control" id="saree-name">
+    </div>
+    <div class="mb-3">
+        <label for="exampleFormControlInput1" class="form-label">Serial No</label>
+        <input type="text" class="form-control" id="saree-serial">
+    </div>
+    <div class="mb-3">
+        <label for="exampleFormControlInput1" class="form-label">Select category</label>
+        <select class="form-select" aria-label="Default select example" id="saree-category">
+            <option value="saree">Saree</option>
+            <option value="kurta">Kurta</option>
+            <option value="kurti">Kurti</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="exampleFormControlInput1" class="form-label">Select sub-category</label>
+        <select class="form-select" aria-label="Default select example" id="saree-subcategory">
+            <option value="sambalpuri saree">Sambalpuri Saree</option>
+            <option value="pata saree">Pata Saree</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="exampleFormControlInput1" class="form-label">Set price</label>
+        <input type="number" class="form-control" id="saree-price">
+    </div>
+    <div class="mb-3">
+        <label for="exampleFormControlInput1" class="form-label">Description</label>
+        <input type="text" class="form-control" id="saree-description">
+    </div>
+    <div class="mb-3">
+        <label for="formFileMultiple" class="form-label">Choose images</label>
+        <input class="form-control" type="file" id="saree-images" multiple accept="image/jpeg, image/png, image/jpg">
+    </div>
+    <div class="mb-3">
+        <label for="formFileMultiple" class="form-label">Discount</label>
+        <input class="form-control" type="number" id="saree-discount">
+    </div>
+    <div class="mb-3">
+        <label for="formFileMultiple" class="form-label">Z-value</label>
+        <input class="form-control" type="number" id="saree-zvalue">
+    </div>
+    <div class="mb-3">
+        <label for="formFileMultiple" class="form-label">Tags</label>
+        <input class="form-control" type="text" id="saree-tags">
+    </div>
+    <button type="submit" class="btn btn-outline-dark mb-3" id="create-btn">Create product</button>
+</form>
+{% endblock %}
+
+{% block customscript %}
+<script type="module" src="{{ url_for('static', filename='admin/scripts/uploadProdocuts.js') }}"></script>
+{% endblock %}

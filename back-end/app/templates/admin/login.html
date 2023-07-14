@@ -1,0 +1,20 @@
+{% extends "admin/base.html" %}
+
+{% block navbarbtn %}
+<button type="button" class="btn btn-outline-dark">Login</button>
+{% endblock %}
+
+{% block content %}
+<h3 class="text-center mt-2">Hello Admin</h3>
+<form class="container-fluid phone-container" style="width: 70%;">
+    <div class="mb-3">
+        <label for="phoneno" class="form-label">Phone number(without country code)</label>
+        <input type="number" class="form-control phoneno" id="phoneno">
+    </div>
+    <button type="submit" class="btn btn-primary otp-btn recaptcha-widget" id="recaptcha-widget">Send otp</button>
+</form>
+{% endblock %}
+
+{% block customscript %}
+<script type="module" src="{{ url_for('static', filename='admin/scripts/login.js') }}"></script>
+{% endblock %}
