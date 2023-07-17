@@ -73,12 +73,11 @@ class create_new_product(Resource):
 # get individual product
 
 def get_individual_item(sub_category_name, serial_number):
-    query = sub_category_name.where("serial", "==", serial_number)
+    from app.products.firebase_products_ref import sambalpuri_saree, pata_saree
 
-    response = query.get()
+    doc = sub_category_name.document(serial_number).get()
 
-    for result in response:
-        doc_data = result.to_dict()
+    doc_data = doc.to_dict()
 
     return {
         "message": "success",
@@ -91,7 +90,7 @@ class get_item(Resource):
 
         from app.products.firebase_products_ref import sambalpuri_saree, pata_saree
 
-        if product_category == "saree":
+        if product_subcategory == "saree":
 
             return get_individual_item(sambalpuri_saree, serial_number)
 

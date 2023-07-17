@@ -74,6 +74,7 @@ const NavContainer = styled.header`
     display: flex;
     justify-content: space-between;
     align-items: center;
+    z-index: 100000;
 
     @media screen and (min-width: 768px){
         padding: 0 20px;
