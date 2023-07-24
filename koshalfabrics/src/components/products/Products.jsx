@@ -64,7 +64,6 @@ const Products = (props) => {
             dataLength={products.length}>
             {
                 products.map((product) => {
-                    console.log(product)
                     return (
                         <ProductHolder key={product.id} onClick={() => navigate(`/product/${product.id}`)}>
                             <ProductImage src={'https://' + product.image_url[0]} style={{ height: '200px' }} />

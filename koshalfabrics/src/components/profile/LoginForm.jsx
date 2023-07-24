@@ -1,4 +1,3 @@
-import React from 'react';
 import { styled } from 'styled-components';
 import colorScheme from '../colorScheme';
 import loginPageStockImage from '../../assets/loginPageStockImage.jpeg';
@@ -6,6 +5,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom'
 import { initializeApp } from "firebase/app";
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import { SERVER_IP } from '../../../config';
 
 const fbConfig = {
     apiKey: "AIzaSyDFdItHcrxC26dAQXij8ssiRLe_UInrymE",
@@ -29,7 +29,7 @@ const LoginForm = () => {
     const navigate = useNavigate()
 
     const handlephonenumberinput = (e) => {
-        setPhoneNumberInput((phoneNumberInput) => e.target.value)
+        setPhoneNumberInput(() => e.target.value)
     }
 
     const handleOtpInput = (e) => {
@@ -37,11 +37,24 @@ const LoginForm = () => {
     }
 
     const handleOtpSubmit = (e) => {
+        console.log('inside of otp handler now')
         e.preventDefault()
         window.authUserVerify.confirm(otpInput)
             .then((resp) => {
                 console.log(resp)
-                navigate('/')
+                fetch(
+                    `${SERVER_IP}/create-new-user`,
+                    {
+                        method: "POST",
+                        credentials: 'include',
+                        headers: {
+                            "Content-type": "application/json",
+                            "Authorization": resp.user.accessToken
+                        }
+                    }
+                )
+                .then(() => navigate("/"))
+                .catch((err) => console.log(err))
             })
             .catch(() => alert('login failed'))
     }
@@ -54,7 +67,7 @@ const LoginForm = () => {
 
         window.recaptchaVerifier = new RecaptchaVerifier('sign-in-button', {
             'size': 'invisible',
-            'callback': (response) => {
+            'callback': () => {
                 trySignInUser(phoneNumberInput)
             }
         }, firebaseAuth)
@@ -95,7 +108,6 @@ const LoginForm = () => {
 }
 
 const OtpBox = styled.input`
-    border: 0;
     border-radius: 10px;
     padding: 2%;
     margin: 5%;
@@ -146,7 +158,6 @@ const Form = styled.form`
     }
 `
 const PhoneInput = styled.input`
-    border: 0;
     border-radius: 10px;
     padding: 2%;
     margin: 5%;

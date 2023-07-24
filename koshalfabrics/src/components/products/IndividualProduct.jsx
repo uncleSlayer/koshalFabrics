@@ -21,6 +21,7 @@ const IndividualProduct = () => {
     productPlaceholder,
     productPlaceholder,
   ]);
+
   const [product, setProduct] = useState({
     name: "tingu saree",
     price: 4999,
@@ -28,27 +29,52 @@ const IndividualProduct = () => {
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Velit laoreet id donec ultrices tincidunt arcu. In pellentesque massa placerat duis ultricies lacus. Elementum tempus egestas sed sed. Tristique sollicitudin nibh sit amet commodo nulla facilisi nullam. Ultrices gravida dictum fusce ut. At lectus urna duis convallis convallis tellus. A lacus vestibulum sed arcu. Turpis egestas sed tempus urna et. Consectetur purus ut faucibus pulvinar. Sagittis vitae et leo duis ut diam quam. Aliquam id diam maecenas ultricies mi eget mauris pharetra et. Tincidunt vitae semper quis lectus nulla at volutpat diam. Pulvinar etiam non quam lacus.",
   });
 
+  const handleAddToCartBTN = (e) => {
+    e.preventDefault()
+    fetch(
+      `${SERVER_IP}/cart/additem`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-type": "application/json"
+        },
+        body: JSON.stringify({
+          new_cart_item: indSareeId
+        })
+      }
+    )
+    .then((resp) => {
+      if (!resp.ok) {
+        throw Error
+      }
+      return resp.json()
+    })
+    .then((resp) => console.log(resp))
+    .catch((err) => console.log(err))
+  }
+
   // /item/<product_category>/<product_subcategory>/<serial_number>"
 
   useEffect(() => {
     fetch(`${SERVER_IP}/item/saree/saree/${indSareeId}`)
-    .then(
-      (resp) => {
-        return resp.json()
-      }
-    )
-    .then(
-      (resp) => {
-        console.log(resp.data)
-        const image_link_arr = resp.data.image_url.map((url) => url = 'https://' + url)
-        setImageLinkArray(image_link_arr)
-        setProduct({
-          name: resp.data.name,
-          price: resp.data.price,
-          description: resp.data.description
-        })
-      }
-    )
+      .then(
+        (resp) => {
+          return resp.json()
+        }
+      )
+      .then(
+        (resp) => {
+          console.log(resp.data)
+          const image_link_arr = resp.data.image_url.map((url) => url = 'https://' + url)
+          setImageLinkArray(image_link_arr)
+          setProduct({
+            name: resp.data.name,
+            price: resp.data.price,
+            description: resp.data.description
+          })
+        }
+      )
   }, [indSareeId]);
 
   return (
@@ -66,7 +92,7 @@ const IndividualProduct = () => {
         <ProductName> {product.name} </ProductName>
         <ProductPrice> ₹ {product.price} </ProductPrice>
         <ProductDescription> {product.description} </ProductDescription>
-        <AddToCartBtn>Add to cart</AddToCartBtn>
+        <AddToCartBtn onClick={handleAddToCartBTN}>Add to cart</AddToCartBtn>
       </ProductInfoContainer>
     </div>
   );
