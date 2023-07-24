@@ -1,83 +1,57 @@
-from flask_restful import Resource, reqparse
 from app.users.firebase_users_ref import users_ref
-from app import db
+from app import app
 
-# create new user
-parser_create_user = reqparse.RequestParser()
-parser_create_user.add_argument(
-    "name", type=str, help="arguement name is required", required=True
-)
-parser_create_user.add_argument(
-    "phone",
-    type=str,
-    help="arguement phone(without country code) is required",
-    required=True,
-)
-parser_create_user.add_argument(
-    "date", type=str, help="arguement date is required", required=True
-)
+# create a new user
+@app.route("/create-new-user", methods=["post"])
+def create_user():
+    from flask import make_response, request
+    from firebase_admin.auth import verify_id_token
 
-# check user exists or not
-parser_check_user = reqparse.RequestParser()
-parser_check_user.add_argument(
-    "phone", type=str, help="arguement phone is required", required=True
-)
+    token = request.headers.get("Authorization")
+    print(token)
+    token_decrypted = verify_id_token(token)
 
+    exists = False
+    result = users_ref.where("phone", "==", token_decrypted["phone_number"]).get()
 
-class create_user(Resource):
+    for res in result:
+        exists = True if res else False
 
-    """
-    name: name of the user,
-    phone: phone number of the user,
-    date: date of account creation of the user
-    """
+    if exists:
+        resp = make_response()
 
-    def post(self):
-        new_user = parser_create_user.parse_args()
+        resp.set_cookie('access_token', token, httponly=True, secure=True, samesite='None', max_age=2592000)
+        resp.access_control_allow_origin = request.origin
+        resp.headers['content-type'] = 'application/json'
+        resp.headers.set("Access-Control-Allow-Credentials", 'true')
 
-        push_user = {
-            "name": new_user["name"],
-            "phone": new_user["phone"],
-            "account created": new_user["date"],
-        }
+        return resp
 
-        users_ref.add(push_user)
+    push_user = {
+        "phone": token_decrypted["phone_number"]
+    }
 
-        return {"message": "success"}, 201
+    users_ref.add(push_user)
 
-
-# check if user exists
-class check_user(Resource):
-
-    """
-    phone: phone number of the user
-    """
-
-    def get(self):
-        check_user_data = parser_check_user.parse_args()
-
-        query = users_ref.where("phone", "==", check_user_data["phone"])
-
-        result = query.get()
-        exists = False
-
-        for res in result:
-            if res:
-                exists = True
-
-        return {"exists": exists, "message": "success"}, 200
+    resp = make_response()
+    resp.set_cookie('access_token', token, httponly=True, secure=True, samesite='None', max_age=2592000)
+    resp.access_control_allow_origin = request.origin
+    resp.headers.set("Access-Control-Allow-Credentials", 'true')
+    return resp
 
 
 # add to cart
-class add_to_cart(Resource):
-    def post(self):
-        from firebase_admin import auth, firestore
-        from flask import request, jsonify
+@app.route("/cart/additem", methods=["post"])
+def add_to_cart():
+    from firebase_admin import auth, firestore
+    from flask import request, make_response
 
-        token = request.cookies.get("token")
+    token = request.cookies.get("access_token")
+
+    if token:
+
         phone = auth.verify_id_token(token).get("phone_number")
 
-        print(phone)
         user_snapshot = users_ref.where("phone", "==", phone).get()
 
         print(user_snapshot)
@@ -88,6 +62,17 @@ class add_to_cart(Resource):
             doc_reference = user.reference
 
         doc_reference.update(
-            {"cart": firestore.ArrayUnion(request.get_json()["new_cart_item"])}
+            {"cart": firestore.ArrayUnion([request.get_json()["new_cart_item"]])}
         )
-        return {"message": "success"}, 201
+        
+        resp = make_response({
+            "message": "item added to cart"
+        })
+        resp.headers["Access-Control-Allow-Origin"] = request.origin
+        resp.headers["Access-Control-Allow-Credentials"] = "true"
+        return resp
+
+    else:
+        return {
+            "error": "user not logged in"
+        }, 400

@@ -23,15 +23,6 @@ def upload_products():
     config = Config(s3={'addressing_style': 'path'})
     if request.method == "GET":
 
-        # token = request.cookies.get("token")
-        # print(token)
-        # phone = auth.verify_id_token(token).get("phone_number")
-
-        # if phone == "8327793515":
-        #     return render_template("admin/uploadproduct.html")
-        # else:
-            # return "fail"
-
         return render_template("admin/uploadproduct.html")
     
     elif request.method == "POST":
